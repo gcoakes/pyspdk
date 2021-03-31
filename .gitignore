@@ -1,0 +1,6 @@
+.venv/
+result*
+.envrc
+*.so
+*.egg-info/
+build/
