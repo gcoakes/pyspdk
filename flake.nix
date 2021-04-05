@@ -32,21 +32,12 @@
         rec {
           defaultPackage = packages.pyspdk;
           packages.pyspdk = pkgs.python3Packages.callPackage ./default.nix {};
-          devShell = pkgs.mkShell {
+          devShell = with pkgs; mkShell {
             inputsFrom = [ packages.pyspdk ];
-            buildInputs = with pkgs.python3Packages; [ setuptools venvShellHook ];
-            venvDir = "./venv";
-            shellHook = ''
-              top="$(git rev-parse --show-toplevel)" || top="$PWD"
-              venv="$top/.venv"
-              test -d "$venv" || python -m venv "$venv"
-              . "$venv/bin/activate"
-              export CPATH="$(echo ${pkgs.python3}/include/* | tr ' ' '\n' | sort | head -n1)"
-              unset SOURCE_DATE_EPOCH
-            '';
-            postShellHook = ''
-              unset SOURCE_DATE_EPOCH
-            '';
+            venvDir = ".venv";
+            nativeBuildInputs = with python3Packages; [ setuptools venvShellHook ];
+            buildInputs = [ libbsd numactl libuuid ];
+            CPATH = "${python3}/include/python3.8";
           };
         }
   );

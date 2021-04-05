@@ -23,7 +23,36 @@ from setuptools import setup, Extension
 spdk_mod = Extension(
     name="spdk",
     sources=["pyspdk.c"],
-    libraries=["spdk_nvme"],
+    libraries=[
+        # Shared libraries
+        "bsd",
+        "numa",
+        "uuid",
+    ],
+    # SPDK requires `-Wl,--whole-archive` to be enabled in order to initialize
+    # properly. Applying it as an `extra_link_args` by itself prevents libc
+    # from linking properly. Thus, they are ommitted from the `libraries`
+    # argument and given directly to the linker.
+    #
+    # TODO: What exactly does --whole-archive do? Presumably it prevents tree
+    # shaking?
+    #
+    # ref: https://github.com/spdk/spdk/issues/1794
+    extra_link_args=[
+        "-Wl,--whole-archive",
+        # SPDK libraries
+        "-lspdk_nvme",
+        "-lspdk_env_dpdk",
+        "-lspdk_vmd",
+        "-lspdk_sock",
+        "-lspdk_log",
+        "-lspdk_util",
+        # DPDK libraries
+        "-lrte_eal",
+        "-lrte_mempool",
+        "-lrte_bus_pci",
+        "-Wl,--no-whole-archive",
+    ],
 )
 
 setup(

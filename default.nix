@@ -18,12 +18,19 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-{ lib, buildPythonPackage, spdk }:
+{ lib
+, buildPythonPackage
+, spdk
+, dpdk
+, libbsd
+, libuuid
+, numactl
+}:
 buildPythonPackage rec {
   pname = "pyspdk";
   version = "0.1.0";
   src = ./.;
-  buildInputs = [ spdk ];
+  buildInputs = [ spdk dpdk libbsd libuuid numactl ];
   pythonImportsCheck = [ "spdk" ];
   doInstallCheck = true;
   meta = with lib; {
