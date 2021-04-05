@@ -37,7 +37,6 @@
             venvDir = ".venv";
             nativeBuildInputs = with python3Packages; [ setuptools venvShellHook ];
             buildInputs = [ libbsd numactl libuuid ];
-            CPATH = "${python3}/include/python3.8";
           };
         }
   );
