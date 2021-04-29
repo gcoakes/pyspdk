@@ -20,24 +20,26 @@
 
 {
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixpkgs-unstable;
-    flake-utils.url = github:numtide/flake-utils;
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }: flake-utils.lib.eachDefaultSystem (
-    system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-        rec {
-          defaultPackage = packages.pyspdk;
-          packages.pyspdk = pkgs.python3Packages.callPackage ./default.nix {};
-          devShell = with pkgs; mkShell {
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let pkgs = nixpkgs.legacyPackages.${system};
+      in rec {
+        defaultPackage = packages.pyspdk;
+        packages.pyspdk = pkgs.python3Packages.callPackage ./default.nix { };
+        devShell = with pkgs;
+          mkShell {
             inputsFrom = [ packages.pyspdk ];
             venvDir = ".venv";
-            nativeBuildInputs = with python3Packages; [ setuptools venvShellHook ];
+            nativeBuildInputs = with python3Packages; [
+              python3
+              setuptools
+              venvShellHook
+            ];
             buildInputs = [ libbsd numactl libuuid ];
           };
-        }
-  );
+      });
 }
